@@ -88,3 +88,9 @@ farm-sector.writing {
     animation-duration: 1s;
     animation-name: animate-writing;
 }
+
+button {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}

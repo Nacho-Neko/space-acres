@@ -12,6 +12,7 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 use subspace_core_primitives::BlockNumber;
 use tracing::error;
+use crate::open_folder;
 
 /// Maximum blocks to store in the import queue.
 // HACK: This constant comes from Substrate's sync, but it is not public in there
@@ -31,6 +32,7 @@ pub enum NodeInput {
         node_path: PathBuf,
     },
     NodeNotification(NodeNotification),
+    OpenNodeFolder(),
 }
 
 #[derive(Debug)]
@@ -64,12 +66,17 @@ impl Component for NodeView {
             set_spacing: 10,
 
             gtk::Box {
-                gtk::Label {
+                gtk::Button {
                     add_css_class: "heading",
+                    set_tooltip: "Open Folders",
+                    set_use_underline: false,
                     set_halign: gtk::Align::Start,
-                    #[watch]
-                    set_label: &model.chain_name,
+                    set_label:  &format!("{}",&model.chain_name),
+                    connect_clicked[sender] => move |_| {
+                        sender.input(NodeInput::OpenNodeFolder())
+                    }
                 },
+
 
                 gtk::Box {
                     set_halign: gtk::Align::End,
@@ -300,6 +307,10 @@ impl NodeView {
                     }
                 }
             },
+            NodeInput::OpenNodeFolder() => {
+                let node_path = self.node_path.lock().clone();
+                open_folder(node_path);
+            }  
         }
     }
 

@@ -3,6 +3,7 @@
 
 mod backend;
 mod frontend;
+mod shortcut;
 
 use crate::backend::config::RawConfig;
 use crate::backend::{wipe, BackendAction, BackendNotification};
@@ -35,6 +36,7 @@ use tracing::{error, info, warn};
 use tracing_subscriber::filter::LevelFilter;
 use tracing_subscriber::prelude::*;
 use tracing_subscriber::EnvFilter;
+use crate::shortcut::open_folder;
 
 /// Number of log files to keep
 const LOG_FILE_LIMIT_COUNT: usize = 5;
@@ -82,6 +84,8 @@ type PosTable = ChiaTable;
 enum AppInput {
     BackendNotification(BackendNotification),
     Configuration(ConfigurationOutput),
+    OpenLogfolder,
+    OpenConfigfolder,
     OpenReconfiguration,
     ShowAboutDialog,
     InitialConfiguration,
@@ -222,6 +226,20 @@ impl AsyncComponent for App {
                                 gtk::Box {
                                     set_orientation: gtk::Orientation::Vertical,
                                     set_spacing: 5,
+
+                                    gtk::Button {
+                                        connect_clicked => AppInput::OpenLogfolder,
+                                        set_label: "Logs folder",
+                                        #[watch]
+                                        set_visible: model.current_raw_config.is_some(),
+                                    },
+
+                                    gtk::Button {
+                                        connect_clicked => AppInput::OpenConfigfolder,
+                                        set_label: "Config Folder",
+                                        #[watch]
+                                        set_visible: model.current_raw_config.is_some(),
+                                    },
 
                                     gtk::Button {
                                         connect_clicked => AppInput::OpenReconfiguration,
@@ -514,6 +532,12 @@ impl AsyncComponent for App {
         _root: &Self::Root,
     ) {
         match input {
+            AppInput::OpenLogfolder => {
+                self.open_log_folder();
+            }
+            AppInput::OpenConfigfolder => {
+                self.open_config_folder();
+            }
             AppInput::BackendNotification(notification) => {
                 self.process_backend_notification(notification);
             }
@@ -564,6 +588,16 @@ impl AsyncComponent for App {
 }
 
 impl App {
+    fn open_config_folder(&mut self) {
+        let app_config_dir = dirs::config_dir().expect("config_dir not find").join(env!("CARGO_PKG_NAME"));
+        open_folder(app_config_dir);
+    }
+
+    fn open_log_folder(&mut self) {
+        let config_folder_dir = dirs::data_local_dir().expect("data_local_dir not find").join(env!("CARGO_PKG_NAME"));
+        open_folder(config_folder_dir);
+    }
+
     fn process_backend_notification(&mut self, notification: BackendNotification) {
         match notification {
             // TODO: Render progress
