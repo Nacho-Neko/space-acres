@@ -72,6 +72,7 @@ impl Component for NodeView {
                     set_has_frame: false,
                     set_use_underline: false,
                     set_halign: gtk::Align::Start,
+                    #[watch]
                     set_label: &model.chain_name,
                     connect_clicked[sender] => move |_| {
                         sender.input(NodeInput::OpenNodeFolder())
