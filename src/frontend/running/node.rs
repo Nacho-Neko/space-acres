@@ -69,9 +69,10 @@ impl Component for NodeView {
                 gtk::Button {
                     add_css_class: "heading",
                     set_tooltip: "Open Folders",
+                    set_has_frame: false,
                     set_use_underline: false,
                     set_halign: gtk::Align::Start,
-                    set_label:  &format!("{}",&model.chain_name),
+                    set_label: &model.chain_name,
                     connect_clicked[sender] => move |_| {
                         sender.input(NodeInput::OpenNodeFolder())
                     }
