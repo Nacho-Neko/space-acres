@@ -25,20 +25,18 @@ pub fn open_folder(path : PathBuf) {
     #[cfg(target_os = "windows")]
     {
         let operation = "open\0";
-        let file = path.to_str().unwrap();
-        let parameters = std::ptr::null();
-        let directory = std::ptr::null();
-        let show_cmd = 1;
+        let os_str = path.as_os_str();
+        let c_str = CString::new(os_str.to_string_lossy().into_owned()).expect("CString::new failed");
         unsafe {
             ShellExecuteA(
                 0,
                 operation.as_ptr() as *const i8,
-                file.as_ptr() as *const i8,
-                parameters,
-                directory,
-                show_cmd,
-            );
-        }
+                c_str.as_ptr() as *const i8,
+                std::ptr::null(),
+                std::ptr::null(),
+                1,
+            )
+        };
     }
     #[cfg(target_os = "macos")]
     {
