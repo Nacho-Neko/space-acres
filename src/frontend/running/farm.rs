@@ -12,6 +12,7 @@ use subspace_farmer::single_disk_farm::farming::FarmingNotification;
 use subspace_farmer::single_disk_farm::{
     FarmingError, SectorExpirationDetails, SectorPlottingDetails, SectorUpdate,
 };
+use crate::open_folder;
 
 /// Experimentally found number that is good for default window size to not have horizontal scroll
 const SECTORS_PER_ROW: usize = 108;
@@ -84,6 +85,7 @@ pub(super) enum FarmWidgetInput {
         update: SectorUpdate,
     },
     FarmingNotification(FarmingNotification),
+    OpenFarmFolder(),
     NodeSynced(bool),
 }
 
@@ -119,10 +121,18 @@ impl FactoryComponent for FarmWidget {
             set_spacing: 10,
 
             gtk::Box {
-                gtk::Label {
+                gtk::Button {
+                    set_tooltip: "Open Folders",
+                    set_use_underline: false,
+                    set_has_frame: false,
+                    add_css_class : "folder-button",
                     set_halign: gtk::Align::Start,
                     set_label: &format!("{} [{}]:", self.path.display(), self.size),
+                    connect_clicked[sender] => move |_| {
+                        sender.input(FarmWidgetInput::OpenFarmFolder());
+                    }
                 },
+
 
                 gtk::Box {
                     set_halign: gtk::Align::End,
@@ -409,6 +419,10 @@ impl FarmWidget {
                     self.non_fatal_farming_error.replace(error);
                 }
             },
+            FarmWidgetInput::OpenFarmFolder() => {
+                let path = self.path.clone();
+                open_folder(path);
+            }
             FarmWidgetInput::NodeSynced(synced) => {
                 self.is_node_synced = synced;
             }
