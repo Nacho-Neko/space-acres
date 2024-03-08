@@ -68,7 +68,7 @@ impl Component for NodeView {
             gtk::Box {
                 gtk::Button {
                     add_css_class: "heading",
-                    add_css_class : "fold-button",
+                    add_css_class : "folder-button",
                     set_tooltip: "Open Folders",
                     set_has_frame: false,
                     set_use_underline: false,

@@ -125,7 +125,7 @@ impl FactoryComponent for FarmWidget {
                     set_tooltip: "Open Folders",
                     set_use_underline: false,
                     set_has_frame: false,
-                    add_css_class : "fold-button",
+                    add_css_class : "folder-button",
                     set_halign: gtk::Align::Start,
                     set_label: &format!("{} [{}]:", self.path.display(), self.size),
                     connect_clicked[sender] => move |_| {
